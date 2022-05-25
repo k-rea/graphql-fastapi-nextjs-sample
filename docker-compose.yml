@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./services/api/db
+      dockerfile: local.Dockerfile
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - PGHOST=${PGHOST}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGPORT=${PGPORT}
+      - PGDATABASE=${PGDATABASE}
+      - TZ=Asia/Tokyo
+      - NODE_OPTIONS=--max_old_space_size=4096
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: docker/local.Dockerfile
+    ports:
+      - 127.0.0.1:8004:8000
+    volumes:
+      - ./services/api:/usr/src/app
+    environment:
+      - ENVIRONMENT=dev
+      - TESTING=0
+      - PGHOST=${PGHOST}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGPORT=${PGPORT}
+      - PGDATABASE=${PGDATABASE}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_TEST_URL=${DATABASE_TEST_URL}
+    depends_on:
+      - db
+
+  front:
+    stdin_open: true
+    build:
+      context: ./services/front
+      dockerfile: docker/local.Dockerfile
+    command: npm run dev
+    volumes:
+      - './services/front:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8004
+    depends_on:
+      - api

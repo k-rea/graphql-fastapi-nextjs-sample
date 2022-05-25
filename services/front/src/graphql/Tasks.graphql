@@ -1,0 +1,19 @@
+query getAllTasks {
+    tasks {
+        id
+        index
+        isArchive
+        status
+        title
+    }
+}
+
+mutation addTask($title: String!, $index: Int!){
+    addTask(task: {title: $title, index: $index}) {
+        id
+        index
+        isArchive
+        status
+        title
+    }
+}

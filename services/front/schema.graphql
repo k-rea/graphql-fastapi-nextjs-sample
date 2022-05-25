@@ -1,0 +1,36 @@
+type Mutation {
+  addTask(task: TaskInput!): TaskType!
+}
+
+type Query {
+  task(taskId: Int!): TaskType!
+  tasks(task: TaskQuery = null): [TaskType!]!
+}
+
+enum Status {
+  correspondence
+  done
+  not_started
+}
+
+input TaskInput {
+  index: Int!
+  isArchive: Boolean = false
+  status: Status = not_started
+  title: String!
+}
+
+input TaskQuery {
+  id: Int = null
+  isArchive: Boolean = null
+  status: Status = null
+  title: String = null
+}
+
+type TaskType {
+  id: Int!
+  index: Int!
+  isArchive: Boolean!
+  status: Status!
+  title: String!
+}
